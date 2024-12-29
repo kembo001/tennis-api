@@ -8,7 +8,7 @@ app.use(express.json());
 require('dotenv').config();
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
+    host: "44.230.95.183",
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
