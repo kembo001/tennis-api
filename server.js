@@ -1,50 +1,27 @@
 const express = require('express');
-const mysql = require('mysql2');
+const rackets = require ('./rackets')
+const app = require('express') ();
+const cors = require('cors');
+const PORT = 8080;
 
-const app = express();
-app.use(express.json());
+app.use(cors());
 
+app.get('/rackets', (req, res) => {
+    res.json(rackets);
+  });
 
-require('dotenv').config();
-
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-});
-
-db.connect(err => {
-    if (err) {
-        console.error('Database connection failed:', err.stack);
-        return;
+  app.get('/rackets/:id', (req, res) => {
+    const { id } = req.params;
+    const racket = rackets.find(r => r.id === parseInt(id));
+    if (racket) {
+      res.json(racket);
+    } else {
+      res.status(404).send({ message: 'Racket not found' });
     }
-    console.log('Connected to MySQL database!');
-});
-
-const verifyApiKey = (req, res, next) => {
-    const apiKey = req.headers['x-api-key'];
-    if (apiKey !== process.env.API_KEY) {
-        return res.status(403).json({ error: 'Unauthorized access' });
-    }
-    next();
-};
-
-app.get('/racket', verifyApiKey, (req, res) => {
-    const query = 'SELECT * FROM Racket';
-    db.query(query, (err, results) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(results);
-        }
-    });
-});
-
-// Start Server
-const PORT = 5002;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+  });
+  
 
 
+  app.listen(PORT, () => {
+    console.log(`It's alive on http://localhost:${PORT}`);
+  });
